@@ -7,7 +7,7 @@ const Regex = require('regex')
 const rolls = require('./dice rolls/dice')
 const parser = require('./helpers/parser')
 
-const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*/
+const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(advg|dsvg)?((\ )*dc(\ )*(\d)+)?/
 
 
 
@@ -20,9 +20,18 @@ client.on('message', msg => {
     if(msg.content.startsWith('/r')){
         let cmd = msg.content.replace('/r ', '')
         if(regex.test(cmd)){
-            const result = rolls.simpleroll(cmd)
-            const finalstring = `**_${result[0]}_** ← \`[${result[1]}]\` ${cmd}`
-            msg.reply(finalstring) 
+            if(cmd.includes('advg')){
+                msg.reply(finalstring) 
+
+            } else if(cmd.includes('dsvg')){
+                msg.reply(finalstring) 
+
+            } else {
+                const result = rolls.simpleroll(cmd)
+                const finalstring = `**_${result[0]}_** ← \`[${result[1]}]\` ${cmd}`
+                msg.reply(finalstring) 
+
+            }
         } else {
             msg.reply('bad formatting')
         }
