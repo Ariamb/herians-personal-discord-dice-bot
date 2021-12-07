@@ -7,8 +7,8 @@ const Regex = require('regex')
 const rolls = require('./dice rolls/dice')
 const parser = require('./helpers/parser')
 
-const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(advg|dsvg)?((\ )*dc(\ )*(\d)+)?/
-
+const regexd20 = /(\ )*(\d)*d20((\+|\-)(\d)+)?(\ )*(advg|dsvg)?((\ )*dc(\ )*(\d)+)?/
+const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(advg|dsvg)?/
 
 
 client.on('ready', () => {
@@ -17,37 +17,35 @@ client.on('ready', () => {
 
 
 client.on('message', msg => {
+    
     if(msg.content.startsWith('/r')){
+        
         let cmd = msg.content.replace('/r ', '')
-        if(regex.test(cmd)){
-            if(cmd.includes('advg')){
+        if(regexd20.test(cmd)){
+                //const rollargs = parser.diceparser(cmd)
+                //const result = rolls.simpleroll(cmd)
+                //const finalstring = `**_${result[0]}_** ← \`[${result[1]}]\` ${cmd}`
                 msg.reply(finalstring) 
-
-            } else if(cmd.includes('dsvg')){
-                msg.reply(finalstring) 
-
-            } else {
-                const result = rolls.simpleroll(cmd)
-                const finalstring = `**_${result[0]}_** ← \`[${result[1]}]\` ${cmd}`
-                msg.reply(finalstring) 
-
-            }
+        } else if (regex.test(cmd)) {
+            msg.reply('limited features')
         } else {
-            msg.reply('bad formatting')
+            msg.reply('bad formatting.')
         }
     }
     if(msg.content.startsWith('/mr')){
         let cmd = msg.content.replace('/mr ', '')
-        if(regex.test(cmd)){
-            const[total, dices, dicemod] = rolls.multiroll(cmd)
-            msg.reply(parser.multirollformatting(total, dices, dicemod, cmd))
+        if(regexd20.test(cmd)){
+            //const[total, dices, dicemod] = rolls.multiroll(cmd)
+            //msg.reply(parser.multirollformatting(total, dices, dicemod, cmd))
+        } else if (regex.test(cmd)){
+            msg.reply('limited features')
+            //msg.reply('bad formatting')
         } else {
             msg.reply('bad formatting')
         }
     }
     if(msg.content === '/help'){
         const help = `To roll a dice, use: /r [amount]d[dice size]+[modifier], without the brackets. \n` +
-        `In case it wasn't helpful enough, refer to the regular expression: \`\`\`/(\\ )*(\\d)*d(\\d)+((\\+|\\-)(\\d)+)?(\\ )*/\`\`\``
         msg.reply(help)
     }
 })

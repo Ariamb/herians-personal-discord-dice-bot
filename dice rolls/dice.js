@@ -1,8 +1,7 @@
 const random = require('./../helpers/random')
 const parser = require('./../helpers/parser')
 module.exports = {
-    simpleroll: function(roll){
-        const [diceamount, dicesize, dicemod, advg] = parser.diceparser(roll)
+    simpleroll: function(rollargs, type){
         let total = 0
         const dices = []
         for(i = 0; i < diceamount; i++){
