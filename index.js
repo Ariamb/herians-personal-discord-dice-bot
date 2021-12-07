@@ -5,7 +5,9 @@ const client = new discord.Client()
 
 const Regex = require('regex')
 const rolls = require('./dice rolls/dice')
-const parser = require('./helpers/parser')
+const random = require('./helpers/random')
+const { diceparser } = require('./helpers/parser')
+const stringfyMR = require('./helpers/stringfyMR')
 
 const regexd20 = /(\ )*(\d)*d20((\+|\-)(\d)+)?(\ )*(advg|dsvg)?((\ )*dc(\ )*(\d)+)?/
 const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(advg|dsvg)?/
@@ -50,8 +52,5 @@ client.on('message', msg => {
     }
 })
 
-//client.once('ready', () => {
-//    console.log('Bot running')
-//})
 
 client.login(process.env.BOT_TOKEN)

@@ -1,7 +1,8 @@
 module.exports = {
     
     diceparser: function(roll){
-        let rollargs = Object.create()
+        const rollargs = {}
+        rollargs.cmd = roll
         if(roll.includes('advg')){
             rollargs.advg = 1
             roll.replace('advg', '')
@@ -9,6 +10,11 @@ module.exports = {
         else if (roll.includes('dsvg')){
             rollargs.advg = 2
             roll.replace('dsvg', '')
+        }
+        if(roll.includes('dc')){
+            let split = roll.split('dc')
+            rollargs.dc = parseInt(split[1])
+            roll = split[0]
         }
         let split = roll.split('d')
         rollargs.diceamount = parseInt(split[0])
