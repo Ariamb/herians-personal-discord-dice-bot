@@ -5,7 +5,7 @@ const client = new discord.Client()
 
 const random = require('./helpers/random')
 const { diceparser } = require('./helpers/parser')
-const stringfyMR = require('./helpers/stringfyMR')
+const stringfyMR = require('./classes/stringfyMR')
 
 const regex = /^(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(vg|dg)?((\ )*dc(\ )*(\d)+)?$/
 //const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(advg|dsvg)?/

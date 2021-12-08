@@ -1,10 +1,10 @@
-module.exports = class stringfyMR {
+module.exports = class stringfy {
     constructor(args){
         this.total = 0
         this.string = ``
         this.args = args
-    
-    this.dcFacade = function(roll){
+    }
+    dcFacade(roll){
         if(this.args.hasOwnProperty(`dc`)){
             switch(this.args.crit){
                 case -1:
@@ -25,45 +25,13 @@ module.exports = class stringfyMR {
         } else if(this.args.crit === 0) this.string += ` ` + this.constructor.simpledc(roll, this.args)
         
     }
-    }
+    
 
-    addLine(roll){
-        this.string += `\n`
-        this.total += roll + this.args.dicemod
-        this.string += `**${roll + this.args.dicemod}** ← \`${roll}\``
-        if(this.args.dicemod < 0)
-            this.string += ` - \`${-1 * this.args.dicemod}\``
-        else if(this.args.dicemod > 0)
-            this.string += ` + \`${this.args.dicemod}\``
-        this.dcFacade(roll, this.args.dicemod)
-    }
+    addLine(roll){ }
 
-    addLineVgDg(roll1, roll2, advg){ //false == advg, true == advg
-        this.string += `\n`
-        let used
-        let discarded
-        if(advg){
-            used = Math.max(roll1, roll2)
-            discarded = Math.min(roll1, roll2)
-        } else {
-            used = Math.min(roll1, roll2)
-            discarded = Math.max(roll1, roll2)
-        }
-        this.total += used + this.args.dicemod
-        this.string += `**${used + this.args.dicemod}** ← \`${used}\``
-        
-        if(this.args.dicemod < 0)
-            this.string += ` - \`${-1 * this.args.dicemod}\``
-        else if(this.args.dicemod > 0)
-            this.string += ` + \`${this.args.dicemod}\``
-
-        this.string += `, ~~\`${discarded}\`~~`
-        this.dcFacade(used, this.args.dicemod)
-    }
-    finalize(){
-        return `total: \`${this.total}\`, ${this.args.cmd}` + this.string
-        //might aswell delete the object after calling this function
-    }
+    addLineVgDg(roll1, roll2, advg){ }
+    //false == advg, true == advg 
+    finalize(){ }
         
     static rawdc(roll, args){
         if((roll + args.dicemod) >= args.dc)

@@ -21,11 +21,9 @@ module.exports = {
         rollargs.diceamount = parseInt(split[0])
         rollargs.dicemod = 0
         if(split[1].includes('-')){
-            split = split[1].split('-')
-            rollargs.dicemod = -1 * parseInt(split[1])
+            rollargs.dicemod = -1 * parseInt(split[1].split('-')[1])
         } else if (split[1].includes('+')) {
-            split = split[1].split('+')
-            rollargs.dicemod = parseInt(split[1])
+            rollargs.dicemod = parseInt(split[1].split('+')[1])
         }
         rollargs.dicesize = parseInt(split[1])
         rollargs.crit = -1
@@ -35,6 +33,7 @@ module.exports = {
 
         rollargs.failureCritRange = 1
         rollargs.successCritRange = rollargs.dicesize
+        console.log('args:', rollargs)
         return rollargs
     }
 }
