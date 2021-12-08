@@ -3,34 +3,43 @@ module.exports = class stringfyMR {
         this.total = 0
         this.string = ``
         this.args = args
-        console.log(args)
     
-    this.dcFacade = function(roll, mod){
-        console.log(this.args)
+    this.dcFacade = function(roll){
         if(this.args.hasOwnProperty(`dc`)){
             switch(this.args.crit){
+                case -1:
+                    break;
                 case 0:
-                    this.string += ` ` + rawdc(roll, mod, this.args.dc)
+                    this.string += ` ` + this.constructor.rawdc(roll, this.args)
+                    break
                 case 1:
-                    this.string += ` ` + simpledc(roll, mod, this.args.dc)
-                case 1:
-                    this.string += ` ` + variantdc(roll, mod, this.args.dc)
+                    this.string += ` ` + this.constructor.simpledc(roll, this.args)
+                    break
+                case 2:
+                    this.string += ` ` + this.constructor.variantdc(roll, this.args)
+                    break
+                default:
+                    this.string += ` ` + this.constructor.simpledc(roll, this.args)
+                    break
             }
-        } else {
-            if(this.args.crit != 0)
-                this.string += ` ` + simpledc(roll, mod)
-        }
+        } else if(this.args.crit === 0) this.string += ` ` + this.constructor.simpledc(roll, this.args)
+        
     }
     }
 
-    addLine(roll, mod){
-        this.total += roll + mod
-        this.string += `**${roll + mod}** ← \`${roll}\` + \`${mod}\``
-        this.dcFacade(roll, mod)
+    addLine(roll){
+        this.string += `\n`
+        this.total += roll + this.args.dicemod
+        this.string += `**${roll + this.args.dicemod}** ← \`${roll}\``
+        if(this.args.dicemod < 0)
+            this.string += ` - \`${-1 * this.args.dicemod}\``
+        else if(this.args.dicemod > 0)
+            this.string += ` + \`${this.args.dicemod}\``
+        this.dcFacade(roll, this.args.dicemod)
     }
 
-    addLineAdvgDvdg(roll1, roll2, mod, advg){ //false == advg, true == advg
-        this.string = `\`\n`
+    addLineVgDg(roll1, roll2, advg){ //false == advg, true == advg
+        this.string += `\n`
         let used
         let discarded
         if(advg){
@@ -40,67 +49,70 @@ module.exports = class stringfyMR {
             used = Math.min(roll1, roll2)
             discarded = Math.max(roll1, roll2)
         }
-        this.total += used + mod
-        this.string += `**${used + mod}** ← \`${used}\`, ~~\`${discarded}\`~~`
-        dcFacade(used, mod)
+        this.total += used + this.args.dicemod
+        this.string += `**${used + this.args.dicemod}** ← \`${used}\``
+        
+        if(this.args.dicemod < 0)
+            this.string += ` - \`${-1 * this.args.dicemod}\``
+        else if(this.args.dicemod > 0)
+            this.string += ` + \`${this.args.dicemod}\``
+
+        this.string += `, ~~\`${discarded}\`~~`
+        this.dcFacade(used, this.args.dicemod)
     }
     finalize(){
-        console.log(this.args)
-        console.log(this.total)
-        return `total: \`${this.total}\`, ${this.args.cmd} \n` + this.string
+        return `total: \`${this.total}\`, ${this.args.cmd}` + this.string
         //might aswell delete the object after calling this function
     }
-
-}
-function rawdc(roll, mod, target){
-    if((roll + mod) >= target)
-        return `Success!`
-    else 
-        return `Failure!`
-}
-
-
-function simpledc(roll, mod, target){
-    if(roll == 1)
-        return `**Critical Failure!**`
-    if(roll == 20)
-        return `**Critical Success**`
-    if(!target) //optional parameter
-            return ``
-    return rawdc(roll, mod, target)
-}
-    
-function variantdc(roll, mod, target){
-    let successDegree = 0 
-    //-1 or less == crit fail, 0 == no crits (normal failure/success), 1 or more == crit success
-    if(roll == 1) 
-        successDegree += -1
-    else if (roll == 20) 
-        successDegree += 1
-       
-    if(roll + mod >= target + 10)
-        successDegree += 1
-    else if (roll + mod < target - 10)
-        successDegree += -1
         
-    
-    if(roll + mod > target){
-        switch (successDegree){
-            case -1:
-                return `Failure`
-            case 0:
-                return `Success!`
-            case 1:
-                return `Critical Success!`
-        }
-    } else {
-        switch (successDegree){
-            case -1:
-                return `Critical Failure:`
-            case 0:
-                return `Failure!`
-            case 1:
-                return `Success!`
+    static rawdc(roll, args){
+        if((roll + args.dicemod) >= args.dc)
+            return `Success!`
+        else 
+            return `Failure!`
+    }
+
+    static simpledc(roll, args){
+        if(roll >= 1 && roll <= args.failureCritRange)
+            return `**Critical Failure!**`
+        if(roll <= args.dicesize && roll >= args.successCritRange)
+            return `**Critical Success!**`
+        if(!args.dc) //optional parameter
+                return ``
+        return stringfyMR.rawdc(roll, args)
+    }
+        
+    static variantdc(roll, args){
+        let successDegree = 0 
+        //-1 or less == crit fail, 0 == no crits (normal failure/success), 1 or more == crit success
+        if(roll >= 1 && roll <= args.failureCritRange) 
+            successDegree += -1
+        else if (roll >= args.successCritRange && roll <= args.dicesize) 
+            successDegree += 1
+        
+        if(roll + args.dicemod >= args.dc + 10)
+            successDegree += 1
+        else if (roll + args.dicemod < args.dc - 10)
+            successDegree += -1
+            
+        if(roll + args.dicemod > args.dc){
+            switch (successDegree){
+                case -1:
+                    return `Failure`
+                case 0:
+                    return `Success!`
+                case 1:
+                    return `Critical Success!`
+            }
+        } else {
+            switch (successDegree){
+                case -1:
+                    return `Critical Failure:`
+                case 0:
+                    return `Failure!`
+                case 1:
+                    return `Success!`
+            }
         }
     }
 }
