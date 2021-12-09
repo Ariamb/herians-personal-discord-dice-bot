@@ -5,8 +5,8 @@ const client = new discord.Client()
 
 const random = require('./helpers/random')
 const { diceparser } = require('./helpers/parser')
-const stringfyMR = require('./classes/stringfyMR')
-
+const Multi = require('./classes/Multi')
+const docs = require('./docs/docs')
 const regex = /^(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(vg|dg)?((\ )*dc(\ )*(\d)+)?$/
 //const regex = /(\ )*(\d)*d(\d)+((\+|\-)(\d)+)?(\ )*(advg|dsvg)?/
 
@@ -31,27 +31,32 @@ client.on('message', msg => {
         let cmd = msg.content.replace('/mr ', '')
         if(regex.test(cmd)){
             const rollargs = diceparser(cmd) 
-            const reply = new stringfyMR(rollargs)
-
-            while(rollargs.diceamount > 0){
-                if(rollargs.vg === 1){
-                    reply.addLineVgDg(random.randomInt(rollargs.dicesize), random.randomInt(rollargs.dicesize), true)
-                } else if(rollargs.vg === 2) {
-                    reply.addLineVgDg(random.randomInt(rollargs.dicesize), random.randomInt(rollargs.dicesize), false)
-                } else {
-                    reply.addLine(random.randomInt(rollargs.dicesize))
+            const rollResult = new Multi(rollargs)
+            if(rollResult.fitsReply()){
+                while(rollargs.diceamount > 0){
+                    if(rollargs.vg === 1){
+                        rollResult.addLineVgDg(random.randomInt(rollargs.dicesize), random.randomInt(rollargs.dicesize), true)
+                    } else if(rollargs.vg === 2) {
+                        rollResult.addLineVgDg(random.randomInt(rollargs.dicesize), random.randomInt(rollargs.dicesize), false)
+                    } else {
+                        rollResult.addLine(random.randomInt(rollargs.dicesize))
+                    }
+                    rollargs.diceamount--
                 }
-                rollargs.diceamount--
+                const final = rollResult.finalize()
+                console.log(`real size: ${final.length}`)
+                msg.reply(final)
+            } else {
+                msg.reply('The resulting roll is too big to be displayed.')
             }
-            msg.reply(reply.finalize())
-            delete reply     
+            
+            delete rollResult
         } else {
             msg.reply('bad formatting')
         }
     }
     if(msg.content === '/help'){
-        const help = `To roll a dice, use: /r [amount]d[dice size]+[modifier], without the brackets. \n` +
-        msg.reply(help)
+        msg.reply(docs)
     }
 })
 

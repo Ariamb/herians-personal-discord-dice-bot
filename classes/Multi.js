@@ -1,7 +1,41 @@
-const stringfy = require("./stringfy")
+const Stringfy = require("./Roll")
 
-module.exports = class MultiRoll extends stringfy {
+module.exports = class Multi extends Stringfy {
 
+    fitsReply(){
+        const header = this.args.cmd.length + 34
+        /*
+        why 25:
+        string template: 13 (including `` and \n)
+        this.total estimated as 2;
+        estimated "reply" tax: 22
+        */
+        let lineSize = (this.args.dicesize.toString().length + 5 + this.args.dicemod.toString().length)
+
+        /*
+        why 5:
+        template string: 8 (including `` and \n)
+        */
+
+        if(this.args.hasOwnProperty('dc')){
+            const critOdds = (this.args.dicesize - 2)/this.args.dicesize
+            lineSize += 10 * critOdds + 23 * (1 - critOdds)
+        }
+        /*
+        why :
+        10 for the template string (including \n)
+        dicesize == 100%
+        dicesize -2 == ?%
+        2 == ?%
+        23 extra characters to simulate a critical:
+        crits happen only 2 out of this.args.dicesize times. 
+        */
+        lineSize = lineSize * this.args.diceamount
+        lineSize += header
+        console.log(`Estimated size: ${lineSize}`)
+        return !(lineSize >= 2000)
+        //or return (lineSize >= 2000) ? false : true
+    }
     addLine(roll){
         this.string += `\n`
         this.total += roll + this.args.dicemod

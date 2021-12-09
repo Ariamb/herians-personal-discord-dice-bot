@@ -1,14 +1,22 @@
-module.exports = class stringfy {
+module.exports = class Rolls {
     constructor(args){
         this.total = 0
         this.string = ``
         this.args = args
+        
+        //return Rolls.resolve()
+    }
+
+    estimateLength(){
+
+    }
+    resolve(){
+
+        return this.string
     }
     dcFacade(roll){
         if(this.args.hasOwnProperty(`dc`)){
             switch(this.args.crit){
-                case -1:
-                    break;
                 case 0:
                     this.string += ` ` + this.constructor.rawdc(roll, this.args)
                     break
@@ -32,7 +40,7 @@ module.exports = class stringfy {
     addLineVgDg(roll1, roll2, advg){ }
     //false == advg, true == advg 
     finalize(){ }
-        
+
     static rawdc(roll, args){
         if((roll + args.dicemod) >= args.dc)
             return `Success!`
@@ -47,7 +55,7 @@ module.exports = class stringfy {
             return `**Critical Success!**`
         if(!args.dc) //optional parameter
                 return ``
-        return stringfyMR.rawdc(roll, args)
+        return Rolls.rawdc(roll, args)
     }
         
     static variantdc(roll, args){
