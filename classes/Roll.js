@@ -6,13 +6,8 @@ module.exports = class Rolls {
         
         //return Rolls.resolve()
     }
+    generateReply(){
 
-    estimateLength(){
-
-    }
-    resolve(){
-
-        return this.string
     }
     dcFacade(roll){
         if(this.args.hasOwnProperty(`dc`)){
@@ -34,19 +29,13 @@ module.exports = class Rolls {
         
     }
     
-
-    addLine(roll){ }
-
-    addLineVgDg(roll1, roll2, advg){ }
-    //false == advg, true == advg 
-    finalize(){ }
-
     static rawdc(roll, args){
-        if((roll + args.dicemod) >= args.dc)
+        if(this.operation(roll, args.dicemod, args.diceop) >= args.dc)
             return `Success!`
         else 
             return `Failure!`
-    }
+        }
+    
 
     static simpledc(roll, args){
         if(roll >= 1 && roll <= args.failureCritRange)
@@ -66,12 +55,12 @@ module.exports = class Rolls {
         else if (roll >= args.successCritRange && roll <= args.dicesize) 
             successDegree += 1
         
-        if(roll + args.dicemod >= args.dc + 10)
+        if(operation(roll, args.dicemod, args.diceop) >= args.dc + 10)
             successDegree += 1
-        else if (roll + args.dicemod < args.dc - 10)
+        else if (operation(roll, args.dicemod, args.diceop) < args.dc - 10)
             successDegree += -1
             
-        if(roll + args.dicemod > args.dc){
+        if(operation(roll, args.dicemod, args.diceop) > args.dc){
             switch (successDegree){
                 case -1:
                     return `Failure`
@@ -90,5 +79,17 @@ module.exports = class Rolls {
                     return `Success!`
             }
         }
+    }
+    static operation(a, b, op){
+        if(op === '')
+            return a
+        if(op === '+')
+            return a + b
+        if(op === '-')
+            return a - b
+        if(op === '*')
+            return a * b
+        if(op === '/')
+            return a / b
     }
 }
